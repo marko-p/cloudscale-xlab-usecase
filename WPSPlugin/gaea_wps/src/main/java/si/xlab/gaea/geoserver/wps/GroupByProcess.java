@@ -53,15 +53,8 @@ import java.util.logging.Logger;
 public class GroupByProcess implements GeoServerProcess
 {
     private static final Logger LOG = Logger.getLogger(GroupByProcess.class.getName());
-//  Destinacija logov: /var/lib/tomcat7/logs/catalina.out
 
-    // the functions this process can handle
-//    public enum GroupingFunction
-//    {
-//        Count, Average, Max, Median, Min, StdDev, Sum
-//    }
-
-    //    public SimpleFeatureCollection execute (  // Ko bo pripravljen delegat
+    // TODO: Extend aggregation functions and include geometrical functions
 
     @DescribeResult(name = "result", description = "Grouping results")
     public SimpleFeatureCollection execute(
@@ -70,20 +63,8 @@ public class GroupByProcess implements GeoServerProcess
             @DescribeParameter(name = "aggregationSpecification", min = 0, description = "The aggregation specification of the form aggregation(attribute), delimited by commas.") String aggregationSpecification
     ) throws ProcessException, IOException
     {
-        // TODO: to je samo za debugging, odstrani ko bos konec
-//        String rv = "";
-
-        ArrayList<String> groupAttrs = null;
-//        ArrayList<String> aggrSpec = null;
-//        ArrayList<String> unknownFoos;
-//        ArrayList<String> unknownAttrs;
-//        ArrayList<String> unknownAggrs;
+        LinkedList<String> groupAttrs = null;
         List<AttributeDescriptor> allAttrs;
-//        HashMap<String, List<AggregationFunction>> aggrFunctions;
-//        HashSet<Integer> groupIndexes;
-//        HashSet<Integer> aggIndexes;
-//        HashMap<String, AttributeDescriptor> groupDescriptors;
-//        HashMap<String, AttributeDescriptor> aggrDescriptors;
 
         // Check if mandatory parameters are not null
         if (features == null) {
@@ -92,7 +73,7 @@ public class GroupByProcess implements GeoServerProcess
         if (groupingAttributes == null) {
             throw new ProcessException("Please specify the grouping attribute(s)");
         } else {
-            groupAttrs = new ArrayList<String>(Arrays.asList(groupingAttributes.split(", ")));
+            groupAttrs = new LinkedList<String>(Arrays.asList(groupingAttributes.split(", ")));
         }
 
         // Check if the feature collection has more attributes than the grouping attributes list
@@ -101,230 +82,16 @@ public class GroupByProcess implements GeoServerProcess
             throw new ProcessException("The count of supplied grouping attributes is larger than the count of all attributes in the feature collection");
         }
 
-//        // Check if aggregation functions are valid,
-        // Build a map of aggregation attributes and functions to run on them
-//        aggrFunctions = getAggregationFunctionsMap(aggregationSpecification);
-//        unknownFoos = new ArrayList<String>();
-//        if (aggregationSpecification != null) {
-//            aggrSpec = new ArrayList<String>(Arrays.asList(aggregationSpecification.split(", ")));
-//            for (String aggregation : aggrSpec) {
-//                String[] aggSplit = aggregation.replace(")", "").split("\\(", 2);
-//
-//                // We only check aggregation functions
-//                boolean ok = false;
-//                for (AggregationFunction foo : AggregationFunction.values()) {
-//                    if (aggSplit[0].equalsIgnoreCase(foo.name())) {
-//                        ok = true;
-//                        List<AggregationFunction> foos;
-//                        if (aggrFunctions.containsKey(aggSplit[1])) {
-//                            foos = aggrFunctions.get(aggSplit[1]);
-//                        } else {
-//                            foos = new ArrayList<AggregationFunction>();
-//                        }
-//                        foos.add(foo);
-//                        aggrFunctions.put(aggSplit[1], foos);
-//                        break;
-//                    }
-//                }
-//
-//                if (!ok) {
-//                    unknownFoos.add(aggSplit[0]);
-//                }
-//            }
-//        }
-
-        // Collect grouping and aggregation attribute indexes and check for their validity
-//        groupIndexes = new HashSet<Integer>();
-//        aggIndexes = new HashSet<Integer>();
-//        groupDescriptors = new HashMap<String, AttributeDescriptor>();
-//        aggrDescriptors = new HashMap<String, AttributeDescriptor>();
-//        unknownAttrs = new ArrayList<String>(groupAttrs);
-//        unknownAggrs = new ArrayList<String>(aggrFunctions.keySet());
-//        for (int i = 0; i < allAttrs.size(); i++) {
-//            String attName = allAttrs.get(i).getLocalName();
-//
-//            // Collect grouping attribute indexes
-//            for (String groupAttName : unknownAttrs) {
-//                if (attName.equals(groupAttName)) {
-//                    groupIndexes.add(i);
-//                    groupDescriptors.put(attName, allAttrs.get(i));
-//                    unknownAttrs.remove(groupAttName);
-//                    break;
-//                }
-//            }
-//
-//            // Check aggregation attributes for validity
-//            for (String aggAttName : unknownAggrs) {
-//                if (attName.equals(aggAttName)) {
-//                    aggIndexes.add(i);
-//                    aggrDescriptors.put(attName, allAttrs.get(i));
-//                    unknownAggrs.remove(aggAttName);
-//                    break;
-//                }
-//            }
-//
-//            if (unknownAttrs.isEmpty() && unknownAggrs.isEmpty()) {
-//                break;
-//            }
-//        }
-//
-//        // Throw exception if we found unknown grouping attributes
-//        if (!unknownAttrs.isEmpty()) {
-//            ArrayList<String> validAttrNames = new ArrayList<String>();
-//            for (AttributeDescriptor desc : allAttrs) {
-//                validAttrNames.add(desc.getLocalName());
-//            }
-//            String msg = makeExceptionString("Could not find grouping attribute(s) ", unknownAttrs, ". The valid values are ", validAttrNames);
-//
-//            rv = rv.concat(", ").concat(msg);
-////            throw new ProcessException(msg);
-//        }
-//
-//        // Throw exception if we found unknown aggregation attributes
-//        if (!unknownAggrs.isEmpty()) {
-//            ArrayList<String> validAttrNames = new ArrayList<String>();
-//            for (AttributeDescriptor desc : allAttrs) {
-//                validAttrNames.add(desc.getLocalName());
-//            }
-//            String msg = makeExceptionString("Could not find aggregation attribute(s) ", unknownAggrs, ". The valid values are ", validAttrNames);
-//
-//            rv = rv.concat(", ").concat(msg);
-////            throw new ProcessException(msg);
-//        }
-
-        // Split features into FeatureCollections, based on supplied grouping attribute names
-//        HashMap<List<Object>, DefaultFeatureCollection> featureMap = splitFeatures(features, groupAttrs);
-//
-//        // Aggregate on each split FeatureCollection
-//        AggregateProcess aggregateProcess = new AggregateProcess();
-//        for (List<Object> key : featureMap.keySet()) {
-//            DefaultFeatureCollection fc = featureMap.get(key);
-//            for (String agg : aggrFunctions.keySet()) {
-//                Results results = aggregateProcess.execute(fc, agg, new HashSet<AggregationFunction>(aggrFunctions.get(agg)), false, new NullProgressListener());
-//                rv = rv.concat("Group: ").concat(key.toString()).concat(" -> ");
-//                if (results != null) {
-//                    if (results.getAverage() != null)           rv = rv.concat("Average: ").concat(results.getAverage().toString()).concat(", ");
-//                    if (results.getCount() != null)             rv = rv.concat("Count: ").concat(results.getCount().toString()).concat(", ");
-//                    if (results.getMax() != null)               rv = rv.concat("Max: ").concat(results.getMax().toString()).concat(", ");
-//                    if (results.getMin() != null)               rv = rv.concat("Min: ").concat(results.getMin().toString()).concat(", ");
-//                    if (results.getMedian() != null)            rv = rv.concat("Median: ").concat(results.getMedian().toString()).concat(", ");
-//                    if (results.getStandardDeviation() != null) rv = rv.concat("StdDev: ").concat(results.getStandardDeviation().toString()).concat(", ");
-//                    if (results.getSum() != null)               rv = rv.concat("Sum: ").concat(results.getSum().toString());
-//                }
-//            }
-//            rv = rv.concat("\n");
-//        }
-
-//        return new Results();
-//        if (rv.length() == 0) {
-//            rv = "All ok";
-//        }
-//        return rv;
         return DataUtilities.simple(new GroupFeatureCollection(features, groupingAttributes, aggregationSpecification));
     }
-
-//    private static HashMap<String, List<AggregationFunction>> getAggregationFunctionsMap(String aggregationSpecification)
-//    {
-//        HashMap<String, List<AggregationFunction>> rv = new HashMap<String, List<AggregationFunction>>();
-//        ArrayList<String> unknownFoos = new ArrayList<String>();
-//        if (aggregationSpecification != null) {
-//            ArrayList<String> aggrSpec = new ArrayList<String>(Arrays.asList(aggregationSpecification.split(", ")));
-//            for (String aggregation : aggrSpec) {
-//                String[] aggSplit = aggregation.replace(")", "").split("\\(", 2);
-//
-//                // We only check aggregation functions
-//                boolean ok = false;
-//                for (AggregationFunction foo : AggregationFunction.values()) {
-//                    if (aggSplit[0].equalsIgnoreCase(foo.name())) {
-//                        ok = true;
-//                        List<AggregationFunction> foos;
-//                        if (rv.containsKey(aggSplit[1])) {
-//                            foos = rv.get(aggSplit[1]);
-//                        } else {
-//                            foos = new ArrayList<AggregationFunction>();
-//                        }
-//                        foos.add(foo);
-//                        rv.put(aggSplit[1], foos);
-//                        break;
-//                    }
-//                }
-//
-//                if (!ok) {
-//                    unknownFoos.add(aggSplit[0]);
-//                }
-//            }
-//        }
-//
-//        // Throw exception if we found unknown aggregation functions
-//        if (!unknownFoos.isEmpty()) {
-//            ArrayList<String> valid = new ArrayList<String>();
-//            for (AggregationFunction agg : AggregationFunction.values()) {
-//                valid.add(agg.name());
-//            }
-//            String msg = makeExceptionString("Invalid aggregation function(s) ", unknownFoos, ". Valid functions are ", valid);
-//            throw new ProcessException(msg);
-//        }
-//    }
-
-    private static String makeExceptionString(String exception, ArrayList<String> invalidList, String hint, ArrayList<String> validList)
-    {
-        // Start with the
-        String rv = exception;
-
-        // Concat with all invalid values
-        ListIterator<String> invalid = invalidList.listIterator();
-        while (invalid.hasNext()) {
-            if (invalid.hasPrevious()) {
-                rv = rv.concat(", ");
-            }
-            rv = rv.concat(invalid.next());
-        }
-
-        // Add a hint with valid values
-        rv = rv.concat(hint);
-        ListIterator<String> valid = validList.listIterator();
-        while (valid.hasNext()) {
-            if (valid.hasPrevious()) {
-                rv = rv.concat(", ");
-            }
-            rv = rv.concat(valid.next());
-        }
-
-        return rv;
-    }
-
-//    private static HashMap<List<Object>, DefaultFeatureCollection> splitFeatures(SimpleFeatureCollection allFeatures, List<String> groupingAttributeNames)
-//    {
-//        HashMap<List<Object>, DefaultFeatureCollection> featureMap = new HashMap<List<Object>, DefaultFeatureCollection>();
-//
-//        SimpleFeatureIterator featureIterator = allFeatures.features();
-//        while (featureIterator.hasNext()) {
-//            SimpleFeature feature = featureIterator.next();
-//            ArrayList<Object> groupingValues = new ArrayList<Object>();
-//            for (String attr : groupingAttributeNames) {
-//                groupingValues.add(feature.getAttribute(attr));
-//            }
-//
-//            if (featureMap.containsKey(groupingValues)) {
-//                featureMap.get(groupingValues).add(feature);
-//            } else {
-//                DefaultFeatureCollection newCollection = new DefaultFeatureCollection();
-//                newCollection.add(feature);
-//                featureMap.put(groupingValues, newCollection);
-//            }
-//        }
-//        featureIterator.close();
-//
-//        return featureMap;
-//    }
-
 
     public static class GroupFeatureCollection extends SimpleProcessingCollection
     {
         private SimpleFeatureCollection delegate;
-        private HashMap<String, List<AggregationFunction>> aggrFunctions;
-        private HashMap<String, AttributeDescriptor> groupDescriptors;
-        private HashMap<String, AttributeDescriptor> aggrDescriptors;
+        private LinkedList<String> groupAttrs;
+        private HashMap<String, List<AggregationFunction>> aggrFunctions;   // key = aggregation attr name, value = list of aggregation functions
+        private HashMap<String, AttributeDescriptor> groupDescriptors;      // key = name of the grouping attribute, value = attribute descriptor
+//        private HashMap<String, AttributeDescriptor> aggrDescriptors;       // key = name of the aggregation attribute, value = attribute descriptor
         private SimpleFeatureType featureType;
         private List<SimpleFeature> featureList;
 
@@ -332,13 +99,13 @@ public class GroupByProcess implements GeoServerProcess
         {
             this.delegate = delegate;
 
-            ArrayList<String> groupAttrs = new ArrayList<String>(Arrays.asList(groupingAttributes.split(", ")));
+            groupAttrs = new LinkedList<String>(Arrays.asList(groupingAttributes.split(", ")));
 
             collectAggregationFunctions(aggregationSpecification);
             collectDescriptors(groupAttrs);
 
             // Split features into FeatureCollections, based on supplied grouping attribute names
-            HashMap<List<Object>, DefaultFeatureCollection> featureMap = splitFeatures(this.delegate, groupAttrs);
+            HashMap<LinkedList<Object>, DefaultFeatureCollection> featureMap = splitFeatures(this.delegate, groupAttrs);
 
             // Aggregate and create features
             featureList = aggregate(featureMap);
@@ -361,12 +128,19 @@ public class GroupByProcess implements GeoServerProcess
         {
             if (featureType == null) {
                 SimpleFeatureTypeBuilder tb = new SimpleFeatureTypeBuilder();
-                for (String key : groupDescriptors.keySet()) {
+                for (String key : groupAttrs) {
                     tb.add(groupDescriptors.get(key));
                 }
-                for (String key : aggrDescriptors.keySet()) {
-                    // TODO: preimenuj AttributeDescriptor, da bo v imenu tudi ime agregatne funkcije
-                    tb.add(aggrDescriptors.get(key));
+
+                for (String key : aggrFunctions.keySet()) {
+                    List<AggregationFunction> functions = aggrFunctions.get(key);
+                    for (AggregationFunction f : functions) {
+                        String name = key.concat("-").concat(f.name());
+                        AttributeTypeBuilder atb = new AttributeTypeBuilder();
+                        atb.setName(name);
+                        atb.setBinding(Number.class);
+                        tb.add(atb.buildDescriptor(name));
+                    }
                 }
                 tb.setName(delegate.getSchema().getName());
                 featureType = tb.buildFeatureType();
@@ -380,12 +154,39 @@ public class GroupByProcess implements GeoServerProcess
             return featureList.size();
         }
 
+        private String makeExceptionString(String exception, LinkedList<String> invalidList, String hint, LinkedList<String> validList)
+        {
+            // Start with the
+            String rv = exception;
+
+            // Concat with all invalid values
+            ListIterator<String> invalid = invalidList.listIterator();
+            while (invalid.hasNext()) {
+                if (invalid.hasPrevious()) {
+                    rv = rv.concat(", ");
+                }
+                rv = rv.concat(invalid.next());
+            }
+
+            // Add a hint with valid values
+            rv = rv.concat(hint);
+            ListIterator<String> valid = validList.listIterator();
+            while (valid.hasNext()) {
+                if (valid.hasPrevious()) {
+                    rv = rv.concat(", ");
+                }
+                rv = rv.concat(valid.next());
+            }
+
+            return rv;
+        }
+
         private void collectAggregationFunctions(String aggregationSpecification) throws ProcessException
         {
             aggrFunctions = new HashMap<String, List<AggregationFunction>>();
-            ArrayList<String> unknownFoos = new ArrayList<String>();
+            LinkedList<String> unknownFoos = new LinkedList<String>();
             if (aggregationSpecification != null) {
-                ArrayList<String> aggrSpec = new ArrayList<String>(Arrays.asList(aggregationSpecification.split(", ")));
+                LinkedList<String> aggrSpec = new LinkedList<String>(Arrays.asList(aggregationSpecification.split(", ")));
                 for (String aggregation : aggrSpec) {
                     String[] aggSplit = aggregation.replace(")", "").split("\\(", 2);
 
@@ -398,7 +199,7 @@ public class GroupByProcess implements GeoServerProcess
                             if (aggrFunctions.containsKey(aggSplit[1])) {
                                 foos = aggrFunctions.get(aggSplit[1]);
                             } else {
-                                foos = new ArrayList<AggregationFunction>();
+                                foos = new LinkedList<AggregationFunction>();
                             }
                             foos.add(foo);
                             aggrFunctions.put(aggSplit[1], foos);
@@ -414,7 +215,7 @@ public class GroupByProcess implements GeoServerProcess
 
             // Throw exception if we found unknown aggregation functions
             if (!unknownFoos.isEmpty()) {
-                ArrayList<String> valid = new ArrayList<String>();
+                LinkedList<String> valid = new LinkedList<String>();
                 for (AggregationFunction agg : AggregationFunction.values()) {
                     valid.add(agg.name());
                 }
@@ -423,15 +224,15 @@ public class GroupByProcess implements GeoServerProcess
             }
         }
 
-        private void collectDescriptors(ArrayList<String> groupAttrs) throws ProcessException
+        private void collectDescriptors(LinkedList<String> groupAttrs) throws ProcessException
         {
             List<AttributeDescriptor> allAttrs = this.delegate.getSchema().getAttributeDescriptors();
 
             // Collect grouping and aggregation attribute indexes and check for their validity
             groupDescriptors = new HashMap<String, AttributeDescriptor>();
-            aggrDescriptors = new HashMap<String, AttributeDescriptor>();
-            ArrayList<String> unknownAttrs = new ArrayList<String>(groupAttrs);
-            ArrayList<String> unknownAggrs = new ArrayList<String>(aggrFunctions.keySet());
+            HashMap<String, AttributeDescriptor> aggrDescriptors = new HashMap<String, AttributeDescriptor>();
+            LinkedList<String> unknownAttrs = new LinkedList<String>(groupAttrs);
+            LinkedList<String> unknownAggrs = new LinkedList<String>(aggrFunctions.keySet());
             for (int i = 0; i < allAttrs.size(); i++) {
                 String attName = allAttrs.get(i).getLocalName();
 
@@ -460,7 +261,7 @@ public class GroupByProcess implements GeoServerProcess
 
             // Throw exception if we found unknown grouping attributes
             if (!unknownAttrs.isEmpty()) {
-                ArrayList<String> validAttrNames = new ArrayList<String>();
+                LinkedList<String> validAttrNames = new LinkedList<String>();
                 for (AttributeDescriptor desc : allAttrs) {
                     validAttrNames.add(desc.getLocalName());
                 }
@@ -471,7 +272,7 @@ public class GroupByProcess implements GeoServerProcess
 
             // Throw exception if we found unknown aggregation attributes
             if (!unknownAggrs.isEmpty()) {
-                ArrayList<String> validAttrNames = new ArrayList<String>();
+                LinkedList<String> validAttrNames = new LinkedList<String>();
                 for (AttributeDescriptor desc : allAttrs) {
                     validAttrNames.add(desc.getLocalName());
                 }
@@ -481,16 +282,21 @@ public class GroupByProcess implements GeoServerProcess
             }
         }
 
-        private HashMap<List<Object>, DefaultFeatureCollection> splitFeatures(SimpleFeatureCollection allFeatures, List<String> groupingAttributeNames)
+        private HashMap<LinkedList<Object>, DefaultFeatureCollection> splitFeatures(SimpleFeatureCollection allFeatures, List<String> groupingAttributeNames)
         {
-            HashMap<List<Object>, DefaultFeatureCollection> featureMap = new HashMap<List<Object>, DefaultFeatureCollection>();
+            HashMap<LinkedList<Object>, DefaultFeatureCollection> featureMap = new HashMap<LinkedList<Object>, DefaultFeatureCollection>();
 
             SimpleFeatureIterator featureIterator = allFeatures.features();
             while (featureIterator.hasNext()) {
                 SimpleFeature feature = featureIterator.next();
-                ArrayList<Object> groupingValues = new ArrayList<Object>();
+                LinkedList<Object> groupingValues = new LinkedList<Object>();
                 for (String attr : groupingAttributeNames) {
-                    groupingValues.add(feature.getAttribute(attr));
+                    Object val = feature.getAttribute(attr);
+                    if (val == null) {
+                        groupingValues.add("");
+                    } else {
+                        groupingValues.add(val);
+                    }
                 }
 
                 if (featureMap.containsKey(groupingValues)) {
@@ -506,43 +312,46 @@ public class GroupByProcess implements GeoServerProcess
             return featureMap;
         }
 
-        private List<SimpleFeature> aggregate(HashMap<List<Object>, DefaultFeatureCollection> featureMap)
+        private List<SimpleFeature> aggregate(HashMap<LinkedList<Object>, DefaultFeatureCollection> featureMap)
         {
             // Aggregate on each split FeatureCollection
-            HashMap<List<Object>, List<Results>> resultsMap = new HashMap<List<Object>, List<Results>>();
+            HashMap<LinkedList<Object>, HashMap<String, Results>> resultsMap = new HashMap<LinkedList<Object>, HashMap<String, Results>>();
             AggregateProcess aggregateProcess = new AggregateProcess();
-            for (List<Object> key : featureMap.keySet()) {
-                ArrayList<Results> resultsList = new ArrayList<Results>();
+            for (LinkedList<Object> key : featureMap.keySet()) {
+                HashMap<String, Results> attResultsMap = new HashMap<String, Results>();
                 DefaultFeatureCollection fc = featureMap.get(key);
-                for (String agg : aggrFunctions.keySet()) {
+                for (String att : aggrFunctions.keySet()) {
                     try {
-                        Results results = aggregateProcess.execute(fc, agg, new HashSet<AggregationFunction>(aggrFunctions.get(agg)), false, new NullProgressListener());
-                        resultsList.add(results);
+                        Results results = aggregateProcess.execute(fc, att, new HashSet<AggregationFunction>(aggrFunctions.get(att)), false, new NullProgressListener());
+                        attResultsMap.put(att, results);
                     } catch (IOException e) {
                         throw new ProcessException(e.getCause());
                     }
                 }
-                resultsMap.put(key, resultsList);
+                resultsMap.put(key, attResultsMap);
             }
 
             // Create features
-            List<SimpleFeature> rv = new ArrayList<SimpleFeature>();
+            List<SimpleFeature> rv = new LinkedList<SimpleFeature>();
             SimpleFeatureBuilder fb = new SimpleFeatureBuilder(buildTargetFeatureType());
             Integer iterationIndex = 1;
-            for (List<Object> key : resultsMap.keySet()) {
+            for (LinkedList<Object> key : resultsMap.keySet()) {
                 // Add grouping attributes
                 fb.addAll(key);
 
                 // Add aggregating attributes
-                List<Results> results = resultsMap.get(key);
-                for (Results r : results) {
-                    if (r.getAverage() != null)             fb.add(r.getAverage());
-                    if (r.getCount() != null)               fb.add(r.getCount());
-                    if (r.getMax() != null)                 fb.add(r.getMax());
-                    if (r.getMin() != null)                 fb.add(r.getMin());
-                    if (r.getMedian() != null)              fb.add(r.getMedian());
-                    if (r.getStandardDeviation() != null)   fb.add(r.getStandardDeviation());
-                    if (r.getSum() != null)                 fb.add(r.getSum());
+                HashMap<String, Results> attResultsMap = resultsMap.get(key);
+                for (String att : aggrFunctions.keySet()) {
+                    Results r = attResultsMap.get(att);
+                    for (AggregationFunction foo : aggrFunctions.get(att)) {
+                        if (foo == AggregationFunction.Average && r.getAverage() != null)           fb.add(r.getAverage());
+                        if (foo == AggregationFunction.Count && r.getCount() != null)               fb.add(r.getCount());
+                        if (foo == AggregationFunction.Max && r.getMax() != null)                   fb.add(r.getMax());
+                        if (foo == AggregationFunction.Min && r.getMin() != null)                   fb.add(r.getMin());
+                        if (foo == AggregationFunction.Median && r.getMedian() != null)             fb.add(r.getMedian());
+                        if (foo == AggregationFunction.StdDev && r.getStandardDeviation() != null)  fb.add(r.getStandardDeviation());
+                        if (foo == AggregationFunction.Sum && r.getSum() != null)                   fb.add(r.getSum());
+                    }
                 }
 
                 // Create feature
@@ -581,5 +390,4 @@ public class GroupByProcess implements GeoServerProcess
             this.iterator = null;
         }
     }
-
 }

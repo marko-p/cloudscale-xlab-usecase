@@ -4,8 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <!--<groupId>si.xlab.gaea</groupId>-->
-    <groupId>org.geoserver</groupId>
+    <groupId>si.xlab.gaea</groupId>
     <artifactId>gaea_wps</artifactId>
     <packaging>jar</packaging>
     <version>1.0</version>
